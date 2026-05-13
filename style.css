@@ -1,4 +1,3 @@
-<style>
 * {
     margin: 0;
     padding: 0;
@@ -91,6 +90,7 @@ body {
     font-weight: 500;
 }
 
+/* 通用组件 */
 .top-bar {
     display: flex;
     align-items: baseline;
@@ -122,55 +122,74 @@ body {
     color: transparent;
 }
 
-.filter-area {
-    background: #e9eff5;
-    border-radius: 40px;
-    padding: 6px 16px;
-    margin: 12px 0 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
+.selector-group {
+    margin: 16px 0;
 }
 
-select {
-    background: white;
-    border: none;
-    padding: 10px 20px 10px 16px;
-    border-radius: 40px;
+.selector-group label {
+    display: block;
     font-size: 0.85rem;
-    font-weight: 500;
-    color: #0b3b5c;
-    width: 180px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-}
-
-.progress-random {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 8px 0 12px;
-}
-
-.progress-badge {
-    background: #d9e2ec;
-    padding: 6px 18px;
-    border-radius: 40px;
     font-weight: 600;
-    font-size: 0.85rem;
+    color: #1f5979;
+    margin-bottom: 6px;
 }
 
-.random-btn {
-    background: none;
-    background-color: #dee8f0;
+select, .write-input, .write-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 28px;
+    border: 1px solid #cbdde6;
+    font-size: 0.95rem;
+    background: white;
+    margin-bottom: 16px;
+}
+
+.write-textarea {
+    min-height: 120px;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.check-btn {
+    background: #1c6f94;
+    color: white;
     border: none;
-    width: 44px;
-    height: 44px;
-    border-radius: 40px;
-    font-size: 1.4rem;
+    padding: 14px;
+    border-radius: 60px;
+    font-weight: 600;
+    width: 100%;
+    margin: 10px 0;
     cursor: pointer;
 }
 
+.result-area {
+    background: #f0f6fa;
+    border-radius: 24px;
+    padding: 16px;
+    margin-top: 16px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.diff-highlight {
+    background-color: #ffebee;
+    color: #c62828;
+    font-weight: 500;
+    border-radius: 4px;
+    padding: 2px 0;
+}
+
+.correct-text {
+    color: #2e7d32;
+    font-weight: 500;
+}
+
+hr {
+    margin: 12px 0;
+    border-color: #e2e8f0;
+}
+
+/* 卡片背诵样式（原模块） */
 .flashcard {
     background: white;
     border-radius: 32px;
@@ -288,7 +307,7 @@ select {
     margin-top: 20px;
 }
 
-/* 练习模块样式 */
+/* 练习模块样式（简单占位） */
 .quiz-type-grid {
     display: flex;
     flex-direction: column;
@@ -350,7 +369,7 @@ select {
     border-radius: 28px;
     text-align: center;
 }
-button.next-quiz-btn, button.retry-wrong-btn {
+.next-quiz-btn {
     background: #1c6f94;
     color: white;
     border: none;
@@ -360,8 +379,3 @@ button.next-quiz-btn, button.retry-wrong-btn {
     width: 100%;
     margin-top: 10px;
 }
-.wrong-answer-notice {
-    background: #fee2e2;
-    border-left: 4px solid #ef4444;
-}
-</style>

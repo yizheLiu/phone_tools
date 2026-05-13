@@ -144,12 +144,8 @@ function buildAllQuizQuestions() {
 const allQuestionBank = buildAllQuizQuestions();
 const allDomainsList = rawPerformanceDomains.map(d => d.name);
 
-
-
-// 最后启动首页
-// 注意：考虑到十大知识域数据太长，这里补充完整数据（复制自前面的内容，但为了避免重复，实际运行时下方会完整定义）
-// 由于上面 knowledgeAreasData 未实际定义，现在补全（与之前提供的完全一致）：
-window.knowledgeAreasDataFull = [
+/// ================= 十大知识域数据 =================
+const knowledgeAreasData = [
     { area: "整合管理", process: "制定项目章程", category: "启动", desc: "编写一份正式批准项目并授权项目经理在项目活动中使用组织资源的文件的过程", effect: "1. 明确项目与组织战略之间的直接关系\n2. 确立项目的正式地位\n3. 展示组织对项目的承诺" },
     { area: "整合管理", process: "制定项目管理计划", category: "规划", desc: "定义、准备和协调项目计划的所有组成部分，并把他们整合为一份综合项目管理计划的过程", effect: "生成一份综合文件，用于确定所有项目工作的基础及执行方式" },
     { area: "整合管理", process: "指导与管理项目工作", category: "执行", desc: "为实现项目目标而领导和执行项目管理计划中所确定的工作，并实施已批准变更的过程", effect: "对项目工作和可交付成果开展综合管理，以提高项目成功的可能性" },
@@ -200,5 +196,66 @@ window.knowledgeAreasDataFull = [
     { area: "干系人管理", process: "管理干系人参与", category: "执行", desc: "通过与干系人进行沟通协作，以满足其需求与期望、处理问题，并促进干系人合理参与的过程", effect: "尽可能提高干系人的支持度，并降低干系人的抵制程度" },
     { area: "干系人管理", process: "监督干系人参与", category: "监控", desc: "监督项目干系人的关系，并通过修订参与策略和计划来引导干系人合理参与项目的过程", effect: "随着项目进展和环境变化，维持或提升干系人参与活动的效率和效果" }
 ];
-// 将完整数据赋给全局变量
-const knowledgeAreasData = window.knowledgeAreasDataFull;
+
+
+
+// 辅助函数（用于默写比对）
+function getKeyPointsText(domain) {
+    return domain.keyPoints.join("；");
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+function highlightDiff(userAnswer, correctAnswer) {
+    if (!userAnswer.trim() && !correctAnswer.trim()) return '<span class="correct-text">（空白）</span>';
+    if (userAnswer.trim() === correctAnswer.trim()) {
+        return '<span class="correct-text">✓ 完全正确</span>';
+    }
+    const u = escapeHtml(userAnswer);
+    const c = escapeHtml(correctAnswer);
+    let result = '';
+    let i = 0, j = 0;
+    while (i < u.length || j < c.length) {
+        if (i < u.length && j < c.length && u[i] === c[j]) {
+            result += u[i];
+            i++; j++;
+        } else {
+            let diffUser = '';
+            while (i < u.length && (j >= c.length || u[i] !== c[j])) {
+                diffUser += u[i];
+                i++;
+            }
+            let diffCorrect = '';
+            while (j < c.length && (i >= u.length || (i < u.length && u[i] !== c[j]))) {
+                diffCorrect += c[j];
+                j++;
+            }
+            if (diffUser) result += `<span class="diff-highlight">${diffUser}</span>`;
+            if (diffCorrect) {
+                result += `<span style="background:#fff0c0; color:#b85c00;">【缺:${diffCorrect}】</span>`;
+            }
+        }
+    }
+    return result;
+}
+
+function getWriteResult(userInput, standard, title) {
+    if (!userInput.trim() && !standard.trim()) {
+        return `<div><strong>${title}</strong>：未填写内容（标准答案为空）</div>`;
+    }
+    const isExact = (userInput.trim() === standard.trim());
+    if (isExact) {
+        return `<div><strong>${title}</strong>：<span class="correct-text">✅ 完全正确</span><br>${escapeHtml(standard)}</div>`;
+    } else {
+        const diffHtml = highlightDiff(userInput, standard);
+        return `<div><strong>${title}</strong>：<span style="color:#c62828;">❌ 有差异</span><br>您的输入：${diffHtml}<br><span style="color:#2c5a7a;">标准答案：${escapeHtml(standard)}</span></div>`;
+    }
+}
