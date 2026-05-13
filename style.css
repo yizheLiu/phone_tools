@@ -379,3 +379,19 @@ hr {
     width: 100%;
     margin-top: 10px;
 }
+/* 差异比对新样式 */
+.diff-remove {
+    background-color: #ffebee;
+    color: #c62828;
+    text-decoration: line-through;
+    font-weight: 500;
+    border-radius: 4px;
+    padding: 2px 0;
+}
+.diff-insert {
+    background-color: #fff9c4;
+    color: #f57f17;
+    font-weight: 500;
+    border-radius: 4px;
+    padding: 2px 0;
+}

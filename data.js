@@ -198,11 +198,85 @@ const knowledgeAreasData = [
 ];
 
 
-
-// 辅助函数（用于默写比对）
-function getKeyPointsText(domain) {
-    return domain.keyPoints.join("；");
+// ================= 差异比对核心函数（增补缺失字符，标红多余/错误字符并加删除线） =================
+function computeLCS(s1, s2) {
+    // 计算最长公共子序列矩阵
+    const len1 = s1.length, len2 = s2.length;
+    const dp = Array(len1 + 1).fill().map(() => Array(len2 + 1).fill(0));
+    for (let i = 1; i <= len1; i++) {
+        for (let j = 1; j <= len2; j++) {
+            if (s1[i-1] === s2[j-1]) {
+                dp[i][j] = dp[i-1][j-1] + 1;
+            } else {
+                dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+            }
+        }
+    }
+    return dp;
 }
+
+function buildDiffHtml(userStr, correctStr) {
+    if (!userStr.trim() && !correctStr.trim()) return '<span class="correct-text">（空白）</span>';
+    if (userStr.trim() === correctStr.trim()) return '<span class="correct-text">✓ 完全正确</span>';
+
+    const user = userStr.split('');
+    const correct = correctStr.split('');
+    const dp = computeLCS(user, correct);
+
+    let result = [];
+    let i = user.length, j = correct.length;
+    while (i > 0 || j > 0) {
+        if (i > 0 && j > 0 && user[i-1] === correct[j-1]) {
+            // 匹配字符，正常输出
+            result.unshift({ type: 'match', char: user[i-1] });
+            i--; j--;
+        } else if (j > 0 && (i === 0 || dp[i][j-1] >= dp[i-1][j])) {
+            // 标准答案中有，用户缺失 => 增补（黄色背景）
+            result.unshift({ type: 'insert', char: correct[j-1] });
+            j--;
+        } else {
+            // 用户多余或错误字符 => 标红+删除线
+            result.unshift({ type: 'remove', char: user[i-1] });
+            i--;
+        }
+    }
+
+    // 构建最终 HTML
+    let html = '';
+    for (let item of result) {
+        if (item.type === 'match') {
+            html += escapeHtml(item.char);
+        } else if (item.type === 'remove') {
+            html += `<span class="diff-remove">${escapeHtml(item.char)}</span>`;
+        } else if (item.type === 'insert') {
+            html += `<span class="diff-insert">${escapeHtml(item.char)}</span>`;
+        }
+    }
+    return html;
+}
+// 原本的 highlightDiff 保持名称兼容，但内部调用新函数
+function highlightDiff(userAnswer, correctAnswer) {
+    return buildDiffHtml(userAnswer, correctAnswer);
+}
+// 修改 getWriteResult，使用新的 diff 并同时显示标准答案
+function getWriteResult(userInput, standard, title) {
+    if (!userInput.trim() && !standard.trim()) {
+        return `<div><strong>${title}</strong>：未填写内容（标准答案为空）</div>`;
+    }
+    const isExact = (userInput.trim() === standard.trim());
+    if (isExact) {
+        return `<div><strong>${title}</strong>：<span class="correct-text">✅ 完全正确</span><br>${escapeHtml(standard)}</div>`;
+    } else {
+        const diffHtml = buildDiffHtml(userInput, standard);
+        return `<div><strong>${title}</strong>：<span style="color:#c62828;">❌ 有差异</span><br>
+                <div style="background:#f5f5f5; padding:12px; border-radius:16px; margin-top:6px;">
+                    <div style="margin-bottom:6px; font-weight:500;">📝 您的默写（<span class="diff-remove">红色+删除线</span> 为多余/错字，<span class="diff-insert">黄底字</span> 为补入的正确字）：</div>
+                    <div style="line-height:1.6;">${diffHtml}</div>
+                </div>
+                <div style="margin-top:10px; color:#2c5a7a;">📖 标准答案：${escapeHtml(standard)}</div>`;
+    }
+}
+
 
 function escapeHtml(str) {
     if (!str) return '';
@@ -212,50 +286,4 @@ function escapeHtml(str) {
         if (m === '>') return '&gt;';
         return m;
     });
-}
-
-function highlightDiff(userAnswer, correctAnswer) {
-    if (!userAnswer.trim() && !correctAnswer.trim()) return '<span class="correct-text">（空白）</span>';
-    if (userAnswer.trim() === correctAnswer.trim()) {
-        return '<span class="correct-text">✓ 完全正确</span>';
-    }
-    const u = escapeHtml(userAnswer);
-    const c = escapeHtml(correctAnswer);
-    let result = '';
-    let i = 0, j = 0;
-    while (i < u.length || j < c.length) {
-        if (i < u.length && j < c.length && u[i] === c[j]) {
-            result += u[i];
-            i++; j++;
-        } else {
-            let diffUser = '';
-            while (i < u.length && (j >= c.length || u[i] !== c[j])) {
-                diffUser += u[i];
-                i++;
-            }
-            let diffCorrect = '';
-            while (j < c.length && (i >= u.length || (i < u.length && u[i] !== c[j]))) {
-                diffCorrect += c[j];
-                j++;
-            }
-            if (diffUser) result += `<span class="diff-highlight">${diffUser}</span>`;
-            if (diffCorrect) {
-                result += `<span style="background:#fff0c0; color:#b85c00;">【缺:${diffCorrect}】</span>`;
-            }
-        }
-    }
-    return result;
-}
-
-function getWriteResult(userInput, standard, title) {
-    if (!userInput.trim() && !standard.trim()) {
-        return `<div><strong>${title}</strong>：未填写内容（标准答案为空）</div>`;
-    }
-    const isExact = (userInput.trim() === standard.trim());
-    if (isExact) {
-        return `<div><strong>${title}</strong>：<span class="correct-text">✅ 完全正确</span><br>${escapeHtml(standard)}</div>`;
-    } else {
-        const diffHtml = highlightDiff(userInput, standard);
-        return `<div><strong>${title}</strong>：<span style="color:#c62828;">❌ 有差异</span><br>您的输入：${diffHtml}<br><span style="color:#2c5a7a;">标准答案：${escapeHtml(standard)}</span></div>`;
-    }
 }
