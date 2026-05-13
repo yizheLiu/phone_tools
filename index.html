@@ -3,27 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>高项记忆库 · 知识域+绩效域+练习</title>
-    <!-- 1. 引入样式文件 -->
+    <title>高项记忆库 · 背诵+练习+默写</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div id="root" class="app-main"></div>
 
-<!-- 2. 引入数据文件（必须最先） -->
 <script src="data.js"></script>
-<!-- 3. 引入各功能模块（顺序无严格要求，但建议按依赖顺序） -->
 <script src="guide.js"></script>
 <script src="knowledgeModule.js"></script>
 <script src="performanceModule.js"></script>
 <script src="quizModule.js"></script>
-<!-- 4. 初始化应用（必须在所有模块加载后执行） -->
+<script src="writeModule.js"></script>
 <script>
     // 启动首页
     if (typeof GuideModule !== 'undefined') {
         GuideModule.render();
     } else {
-        console.error("GuideModule 未加载，请检查文件路径");
+        console.error("GuideModule 未加载");
     }
 </script>
 </body>

@@ -26,13 +26,11 @@ const GuideModule = {
                     <div class="module-icon">📝</div>
                     <div class="module-name">绩效域默写</div>
                     <div class="module-desc">默写预期目标与绩效要点 · 智能比对</div>
-                    <div class="badge-new">新功能</div>
                 </div>
                 <div class="card-module" id="gotoKnowledgeWrite">
                     <div class="module-icon">📖</div>
                     <div class="module-name">知识域过程默写</div>
                     <div class="module-desc">默写过程描述与作用 · 智能比对</div>
-                    <div class="badge-new">新功能</div>
                 </div>
                 <div class="footer" style="margin-top: 30px;">👉 点选模块，随时随地记忆 👈</div>
             </div>
