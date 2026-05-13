@@ -37,7 +37,7 @@ const GuideModule = {
         `;
         document.getElementById('gotoKnowledge').onclick = () => KnowledgeModule.init();
         document.getElementById('gotoPerformance').onclick = () => PerformanceModule.init();
-        document.getElementById('gotoQuiz').onclick = () => QuizModule.showTypeSelect();
+        // document.getElementById('gotoQuiz').onclick = () => QuizModule.showTypeSelect();
         document.getElementById('gotoPerfWrite').onclick = () => WriteModule.init('performance');
         document.getElementById('gotoKnowledgeWrite').onclick = () => WriteModule.init('knowledge');
     }
